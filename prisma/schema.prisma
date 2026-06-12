@@ -1,0 +1,70 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model ProviderConfig {
+  id              String           @id @default(cuid())
+  name            String
+  baseUrl         String
+  apiKeyEncrypted String
+  defaultModel    String
+  supportedModes  String           @default("[\"text-to-image\"]")
+  enabled         Boolean          @default(true)
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+  tasks           GenerationTask[]
+}
+
+model GenerationTask {
+  id               String           @id @default(cuid())
+  mode             String
+  providerId       String?
+  provider         ProviderConfig?  @relation(fields: [providerId], references: [id], onDelete: SetNull)
+  providerName     String
+  model            String
+  prompt           String
+  negativePrompt   String?
+  width            Int
+  height           Int
+  seed             Int?
+  count            Int              @default(1)
+  sourceImageId    String?
+  maskImageId      String?
+  expandDirections String?
+  upscaleFactor    Int?
+  status           String           @default("pending")
+  errorMessage     String?
+  durationMs       Int?
+  requestPayload   String?
+  responsePayload  String?
+  assets           GeneratedAsset[]
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
+}
+
+model GeneratedAsset {
+  id             String          @id @default(cuid())
+  taskId         String?
+  task           GenerationTask? @relation(fields: [taskId], references: [id], onDelete: SetNull)
+  providerId     String?
+  providerName   String?
+  imageUrl       String
+  thumbnailUrl   String
+  mode           String
+  model          String?
+  prompt         String?
+  negativePrompt String?
+  width          Int?
+  height         Int?
+  seed           Int?
+  tags           String          @default("[]")
+  favorite       Boolean         @default(false)
+  metadata       String?
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+}

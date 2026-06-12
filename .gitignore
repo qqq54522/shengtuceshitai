@@ -1,0 +1,8 @@
+node_modules
+.next
+tsconfig.tsbuildinfo
+.env
+.env.local
+prisma/dev.db
+public/uploads/*
+!public/uploads/.gitkeep
